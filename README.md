@@ -1,4 +1,4 @@
-# Student API — Flask + MySQL CRUD
+# Student management system
 
 REST API built with Flask, SQLAlchemy ORM, and MySQL. Manages **Students** and **Courses** with full CRUD operations.
 
