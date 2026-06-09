@@ -1,7 +1,5 @@
 from datetime import datetime
-
 from flask import jsonify, request
-
 from app.extensions import db
 from app.models.student_model import Student
 
