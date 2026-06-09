@@ -2,7 +2,7 @@ from flask import Blueprint
 
 from app.controllers import student_controller as ctrl
 
-student_bp = Blueprint("students", __name__, url_prefix="/api/students")
+student_bp = Blueprint("student", __name__, url_prefix="/api/student")
 
 
 @student_bp.route("", methods=["POST"])
