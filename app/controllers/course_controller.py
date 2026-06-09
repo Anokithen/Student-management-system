@@ -47,6 +47,10 @@ def _validate_course_payload(data, course_id=None):
         lecture = Lecture.query.get(lecture_id)
         if not lecture:
             errors.append(f"Lecturer with id {lecture_id} does not exist."), 404
+    
+    lecture_id = data.get("lecture_id")
+    if lecture_id is None:
+        errors.append(f"lecturer id is important")
 
     return errors
 
