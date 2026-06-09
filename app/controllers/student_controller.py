@@ -37,8 +37,13 @@ def _validate_student_payload(data, student_id=None):
     if dateofbirth is None or int(dateofbirth).strip() == "":
         errors.append("Date of birth is required")
     
-    elif dateofbirth >= todaydate:
-        errors.append("Date of birth  connot be in the future")
+    else:
+        try:
+            dob = datetime.strptime(str(dateofbirth).strip(), "%Y-%m-%d")
+            if dob >= todaydate:
+                errors.append("Date of birth cannot be in the future")
+        except ValueError:
+            errors.append("Date of birth must be in YYYY-MM-DD format")
 
 def create_student():
     data = request.get_json(silent=True)
@@ -55,7 +60,7 @@ def create_student():
             first_name=data.get("first_name").strip(),
             last_name=data.get("last_name").strip(),
             email=data.get("email").strip(),
-            date_of_birth=datetime(data.get("date_of_birth"))
+            date_of_birth=datetime.strptime(data.get("date_of_birth").strip(), "%Y-%m-%d")
            
         )
         db.session.add(student)
@@ -93,7 +98,7 @@ def update_student(student_id):
 
     try:
         student.first_name = data.get("first_name").strip()
-        student.last_name = data.get("full_name").strip()
+        student.last_name = data.get("last_name").strip()
 
         student.email = data.get("email").strip()
         student.age = int(data.get("age"))
