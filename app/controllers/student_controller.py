@@ -4,7 +4,6 @@ from app.extensions import db
 from app.models.student_model import Student
 
 
-
 def _validate_student_payload(data, student_id=None):
     errors = []
     if not data:
@@ -30,38 +29,38 @@ def _validate_student_payload(data, student_id=None):
         if student_id:
             q = q.filter(Student.id != student_id)
         if q.first():
-            errors.append("Please enter a valid email address.")
-    
+            errors.append("Email address already exists.")
+
     dateofbirth = data.get("date_of_birth")
     todaydate = datetime.today()
-    if dateofbirth is None or int(dateofbirth).strip() == "":
-        errors.append("Date of birth is required")
     
+    if dateofbirth is None or str(dateofbirth).strip() == "":
+        errors.append("Date of birth is required.")
     else:
         try:
             dob = datetime.strptime(str(dateofbirth).strip(), "%Y-%m-%d")
             if dob >= todaydate:
-                errors.append("Date of birth cannot be in the future")
+                errors.append("Date of birth cannot be in the future.")
         except ValueError:
-            errors.append("Date of birth must be in YYYY-MM-DD format")
+            errors.append("Date of birth must be in YYYY-MM-DD format.")
+
+    return errors  
+
 
 def create_student():
     data = request.get_json(silent=True)
     if not data:
         return jsonify({"error": "Request body is required."}), 400
-
     errors = _validate_student_payload(data)
     if errors:
         return jsonify({"errors": errors}), 400
 
-    
     try:
         student = Student(
             first_name=data.get("first_name").strip(),
             last_name=data.get("last_name").strip(),
             email=data.get("email").strip(),
-            date_of_birth=datetime.strptime(data.get("date_of_birth").strip(), "%Y-%m-%d")
-           
+            date_of_birth=datetime.strptime(data.get("date_of_birth").strip(), "%Y-%m-%d"),
         )
         db.session.add(student)
         db.session.commit()
@@ -89,7 +88,7 @@ def update_student(student_id):
         return jsonify({"error": "Student not found."}), 404
 
     data = request.get_json(silent=True)
-    if not data:
+    if not data or not isinstance(data, dict):
         return jsonify({"error": "No data provided to update."}), 400
 
     errors = _validate_student_payload(data, student_id=student_id)
@@ -98,11 +97,9 @@ def update_student(student_id):
 
     try:
         student.first_name = data.get("first_name").strip()
-        student.last_name = data.get("last_name").strip()
-
+        student.last_name = data.get("last_name").strip()  
         student.email = data.get("email").strip()
-        student.age = int(data.get("age"))
-        
+        student.date_of_birth = datetime.strptime(data.get("date_of_birth").strip(), "%Y-%m-%d") 
         db.session.commit()
         return jsonify({"message": "Student updated successfully.", "student": student.to_dict()}), 200
     except Exception:
